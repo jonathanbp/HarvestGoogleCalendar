@@ -1,0 +1,38 @@
+# Google Calendar Event Properties (https://developers.google.com/google-apps/calendar/v3/reference/events#resource)
+#  summary: event title
+#  description: longer event description
+#  status: confirmed | tentative | cancelled
+#  location
+#  colorId: ?
+#  organizer.email, organizer.displayName
+#  creator.email, creator.displayName
+# user:
+# harvestpass:
+# googlepass:
+# range:
+# calendar:
+
+user: jbp@c3a.dk
+calendar: jbp@c3a.dk
+
+mappings:
+  - name: architecture
+    task_id: 1306535
+    project_id: 2039308
+    rule: "summary:^Architecture"
+  - name: innovation
+    project_id: 2039308
+    task_id: 1306538
+    rule: summary:(design|innovation)
+  - name: ledermøde
+    project_id: 1630222
+    task_id: 1034544
+    rule: summary:^Ledermøde$
+  - name: strategi
+    project_id: 1630222
+    task_id: 1034544
+    rule: "summary:[Ss]trateg[iy]"
+  - name: sprints
+    project_id: 2039286
+    task_id: 1306526
+    rule: "summary:[Ss]print"
