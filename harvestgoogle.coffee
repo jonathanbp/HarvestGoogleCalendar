@@ -2,8 +2,6 @@
 
 # https://github.com/visionmedia/commander.js/
 
-# TODO
-
 GoogleClientLogin = require('googleclientlogin').GoogleClientLogin
 Prompt = require("prompt")
 Program = require('commander')
@@ -594,10 +592,11 @@ class Harvester
                     project_id: event.matched_by.project_id
                     task_id: event.matched_by.task_id
                     spent_at: moment(event.start.dateTime).format("ddd, D MMM YYYY")
-                    notes: "#{event.summary} - harvested:#{event.id}".replace(/[Øø]/,"oe").replace(/[Åå]/,"aa").replace(/[Ææ]/,"ae")
+                    # html encode?
+                    notes: "#{escape(event.summary)} - harvested:#{event.id}"
                   },
                   ((result) -> console.log "✔ Created Harvest entry from \"#{event.summary}\" on #{moment(event.start.dateTime).format("ddd, D MMM YYYY")} successfully".green),
-                  (()=>@fail("Could not create entry in Harvest"))
+                  (()=>@fail("Could not create entry #{entry.id} - \"#{event.summary}\" in Harvest"))
                 )
           else
             console.log "Ok, nevermind then.".red
@@ -641,7 +640,7 @@ Prompt.get(
       (p for p in [
         if not Program.user? and not Program.configuration?.user?
           { name: "user", message: "What is your username (exclude @c3a.dk)? " }
-        if not Program.action? and not Program.googlepass? and not Program.configuration?.googlepass?
+        if not (Program.action in ["tasks","clear"]) and not Program.googlepass? and not Program.configuration?.googlepass?
           { name: "googlepass", message: "What is your Google password? ", hidden: true }
         if not Program.harvestpass? and not Program.configuration?.harvestpass?
           { name: "harvestpass", message: "What is your Harvest password? ", hidden: true }
