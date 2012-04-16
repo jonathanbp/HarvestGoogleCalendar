@@ -2,6 +2,8 @@
 
 # https://github.com/visionmedia/commander.js/
 
+# TODO
+
 GoogleClientLogin = require('googleclientlogin').GoogleClientLogin
 Prompt = require("prompt")
 Program = require('commander')
@@ -16,10 +18,10 @@ cliff = require("cliff")
 Program
   .version('0.0.1')
   .option('-c, --configuration [file]', "Location of configuration file.")
-  .option('-t, --tasks', "Show available Harvest tasks")
+  .option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.")
   .option('-u, --user [username]', 'Google username')
-  .option('-hp, --harvestpass [pass]', 'Password for Harvest')
-  .option('-gp, --googlepass [pass]', 'Password for Google')
+  .option('-p, --harvestpass [pass]', 'Password for Harvest')
+  .option('-g, --googlepass [pass]', 'Password for Google')
   .option('-c, --calendar [calendar]', "Name of Google Calendar")
   .option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', 
     (val) -> 
@@ -274,6 +276,8 @@ class Harvest
   ###
   create: (entry, success, fail) ->
 
+    #console.log "CREATE", entry
+
     data = JSON.stringify(entry)
 
     headers = @headers
@@ -289,13 +293,14 @@ class Harvest
     request = HTTPS.request(
       options
       (res) ->
-        fail() if res.statusCode isnt 201
-        chunks = ""
-        res.on('data', (chunk) -> chunks += chunk)
-        res.on('end', () -> 
-          if res.statusCode is 201
-            success(JSON.parse(chunks))
-        )
+        if res.statusCode isnt 201
+          fail()
+        else
+          chunks = ""
+          res.on('data', (chunk) -> chunks += chunk)
+          res.on('end', () -> 
+              success(JSON.parse(chunks))
+          )
     )
 
     request.write(data)
@@ -399,7 +404,7 @@ class Harvester
   _0_harvestauthenticated: ->
     console.log "✔ Harvest: Authenticated".green 
 
-    if @program.tasks
+    if @program.action is "tasks"
       # lists tasks and exit
       @harvest.projectsandtasks(
         ((projects)-> console.log "#{projects.length} projects"),
@@ -410,6 +415,21 @@ class Harvester
         ),
         @_N_exit,
         (() => @fail("Could not get tasks from Harvest"))
+      )
+    else if @program.action is "clear"
+      @harvest.entries(
+        @range.from, 
+        @range.to, 
+        ((entries)=>
+          for entry in entries when entry?.hours isnt "0.0" and @harvest.isCalendared(entry)
+            do (entry) =>
+              @harvest.delete(
+                entry.id,
+                (() -> console.log "✔ Deleted #{entry.id} successfully".green),
+                (()=>@fail("Could not delete entry (#{entry.id}) in Harvest"))
+              )
+        ), 
+        (() => @fail("Harvest: Retrieving existing harvest entries failed."))
       )
     else
       console.log "⬆ Google: Authenticating ...".blue
@@ -567,14 +587,14 @@ class Harvester
                   (()=>@fail("Could not delete entry (#{entry.id}) in Harvest"))
                 )
             for event in creates
-              do (event) ->
+              do (event) =>
                 harvest.create(
                   {
                     hours: event.duration_in_hours
                     project_id: event.matched_by.project_id
                     task_id: event.matched_by.task_id
                     spent_at: moment(event.start.dateTime).format("ddd, D MMM YYYY")
-                    notes: "#{event.summary} - harvested:#{event.id}"
+                    notes: "#{event.summary} - harvested:#{event.id}".replace(/[Øø]/,"oe").replace(/[Åå]/,"aa").replace(/[Ææ]/,"ae")
                   },
                   ((result) -> console.log "✔ Created Harvest entry from \"#{event.summary}\" on #{moment(event.start.dateTime).format("ddd, D MMM YYYY")} successfully".green),
                   (()=>@fail("Could not create entry in Harvest"))
@@ -621,15 +641,15 @@ Prompt.get(
       (p for p in [
         if not Program.user? and not Program.configuration?.user?
           { name: "user", message: "What is your username (exclude @c3a.dk)? " }
-        if not Program.tasks and not Program.googlepass? and not Program.configuration?.googlepass?
+        if not Program.action? and not Program.googlepass? and not Program.configuration?.googlepass?
           { name: "googlepass", message: "What is your Google password? ", hidden: true }
         if not Program.harvestpass? and not Program.configuration?.harvestpass?
           { name: "harvestpass", message: "What is your Harvest password? ", hidden: true }
-        if not Program.tasks and not Program.calendar? and not Program.configuration?.calendar?
+        if not Program.action? and not Program.calendar? and not Program.configuration?.calendar?
           { name: "calendar", message: "Enter calendar from which to extract events. " }
-        if not Program.tasks and not Program.range? and not Program.configuration?.range?.from?
+        if Program.action isnt "tasks" and not Program.range? and not Program.configuration?.range?.from?
           { name: "from", message: "Enter the start date for the search in the form YYYYMMDD. " }
-        if not Program.tasks and not Program.range? and not Program.configuration?.range?.to?
+        if Program.action isnt "tasks" and not Program.range? and not Program.configuration?.range?.to?
           { name: "to", message: "Enter the end date for the search in the form YYYYMMDD. " }
       ] when p?)
       (err, result) -> 
