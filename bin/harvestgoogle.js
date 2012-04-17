@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var GoogleCalendar, GoogleClientLogin, HTTPS, Harvest, Harvester, Program, Prompt, cliff, moment, natural, p, yaml, _;
 var __hasProp = Object.prototype.hasOwnProperty, __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (__hasProp.call(this, i) && this[i] === item) return i; } return -1; };
 
@@ -21,7 +23,7 @@ require("colors");
 
 cliff = require("cliff");
 
-Program.version('0.0.2').option('-c, --configuration [file]', "Location of configuration file.").option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.").option('-u, --user [username]', 'Google username').option('-p, --harvestpass [pass]', 'Password for Harvest').option('-g, --googlepass [pass]', 'Password for Google').option('-c, --calendar [calendar]', "Name of Google Calendar").option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', function(val) {
+Program.version('0.0.3').option('-c, --configuration [file]', "Location of configuration file.").option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.").option('-u, --user [username]', 'Google username').option('-p, --harvestpass [pass]', 'Password for Harvest').option('-g, --googlepass [pass]', 'Password for Google').option('-c, --calendar [calendar]', "Name of Google Calendar").option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', function(val) {
   var r;
   r = val.split("..");
   return {
