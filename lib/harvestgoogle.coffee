@@ -12,11 +12,12 @@ require("colors")
 cliff = require("cliff")
 
 Program
-  .version('0.0.4')
+  .version('0.0.5')
   .option('-c, --configuration [file]', "Location of configuration file.")
   .option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.")
   .option('-u, --user [username]', 'Google username')
   .option('-p, --harvestpass [pass]', 'Password for Harvest')
+  .option('-d, --harvestdomain [domain]', "The Harvest domain, e.g. you access Harvest at http://" + "mydomain".bold + ".harvestapp.com/.")
   .option('-g, --googlepass [pass]', 'Password for Google')
   .option('-c, --calendar [calendar]', "Name of Google Calendar")
   .option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', 
@@ -93,7 +94,7 @@ Harvest
 ###
 class Harvest
 
-  constructor: (@user, @password, login, fail) -> 
+  constructor: (@user, @password, @domain, login, fail) -> 
     # login
     basicauth = new Buffer("#{@user}:#{@password}").toString('base64').trim()
 
@@ -103,7 +104,7 @@ class Harvest
       "Authorization" : "Basic #{basicauth}"
       "User-Agent" :  "Cetrea Harvester/#{Program.version()}"
 
-    @host = "cetrea.harvestapp.com"
+    @host = "#{domain}.harvestapp.com"
 
     options =
       host: @host
@@ -374,7 +375,7 @@ class Harvest
 
 class Harvester 
 
-  constructor: (@user, @googlepass, @harvestpass, @calendar, @range) ->
+  constructor: (@user, @googlepass, @harvestpass, @harvestdomain, @calendar, @range) ->
     @nounInflector = new natural.NounInflector()
     @verbInflector = new natural.PresentVerbInflector()
 
@@ -395,7 +396,7 @@ class Harvester
     @program = program
 
     console.log "⬆ Harvest: Authenticating ...".blue
-    @harvest = new Harvest(@user, @harvestpass, (() => @_0_harvestauthenticated()), (() => @fail("Unable to authenticate with Harvest.")))
+    @harvest = new Harvest(@user, @harvestpass, @harvestdomain, (() => @_0_harvestauthenticated()), (() => @fail("Unable to authenticate with Harvest.")))
 
   _0_harvestauthenticated: ->
     console.log "✔ Harvest: Authenticated".green 
@@ -646,6 +647,8 @@ Prompt.get(
           { name: "googlepass", message: "What is your Google password? ", hidden: true }
         if not Program.harvestpass? and not Program.configuration?.harvestpass?
           { name: "harvestpass", message: "What is your Harvest password? ", hidden: true }
+        if not Program.harvestdomain? and not Program.configuration?.domain?
+          { name: "harvestdomain", message: "What is your Harvest domain? " }
         if not Program.action? and not Program.calendar? and not Program.configuration?.calendar?
           { name: "calendar", message: "Enter calendar from which to extract events. " }
         if Program.action isnt "tasks" and not Program.range? and not Program.configuration?.range?.from?
@@ -659,6 +662,7 @@ Prompt.get(
           Program.user ? Program.configuration?.user ? result.user, 
           Program.googlepass ? Program.configuration?.googlepass ? result.googlepass, 
           Program.harvestpass ? Program.configuration?.harvestpass ? result.harvestpass, 
+          Program.harvestdomain ? Program.configuration?.harvestdomain ? result.harvestdomain, 
           Program.calendar ? Program.configuration?.calendar ? result.calendar,
           Program.range ? Program.configuration?.range ? { from: result.from, to: result.to }
         )

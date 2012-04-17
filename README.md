@@ -1,6 +1,6 @@
 # HarvestGoogleCalendar
 
-`v. 0.0.4`
+`v. 0.0.5`
 
 This is a tool for harvesting information from [Google Calendar](http://google.com/calendar) into the [Harvest](http://www.getharvest.com/) time tracking system. The tool basically;
 
@@ -11,13 +11,19 @@ This is a tool for harvesting information from [Google Calendar](http://google.c
 
 The new events are found by matching each event against a set of configurable mappings (described under the "configuration file" section).
 
+## Install
+
+Get [node.js](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager) and [npm](http://npmjs.org/), then:
+
+    $ npm install harvestgoogle
+
 ## How To Run
 
 Options can either be given as command-line arguments, input into a YAML configuration file or be input when prompted.
+  
+    Usage: harvestgoogle.coffee [options]
 
-	Usage: harvestgoogle [options]
-
-	Options:
+    Options:
 
     -h, --help                          output usage information
     -V, --version                       output the version number
@@ -25,13 +31,15 @@ Options can either be given as command-line arguments, input into a YAML configu
     -a, --action [action]               Execute action. Available actions are: 'tasks' to show a list of available tasks in Harvest, 'clear' to clear all linked tasks in Harvest. Leave blank to synchronize.
     -u, --user [username]               Google username
     -p, --harvestpass [pass]            Password for Harvest
+    -d, --harvestdomain [domain]        The Harvest domain, e.g. you access Harvest at http://mydomain.harvestapp.com/.
     -g, --googlepass [pass]             Password for Google
     -c, --calendar [calendar]           Name of Google Calendar
-    -r, --range [YYYYMMDD]..[YYYYMMDD]  A timerange 
+    -r, --range [YYYYMMDD]..[YYYYMMDD]  A timerange
 
 ## Configuration file
 
-The configuration file is a YAML document containing arguments to the process *(optional)* and a set of mappings. Each mapping interpreted as so:
+The configuration file is a YAML document containing arguments to the process *(optional)* and a set of mappings.
+Each mapping interpreted as so:
 
  * *name* gives a name to the mapping,
  * *task_id* indicates which kind of Harvest task to create an entry,

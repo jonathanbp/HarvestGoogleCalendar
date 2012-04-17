@@ -23,7 +23,7 @@ require("colors");
 
 cliff = require("cliff");
 
-Program.version('0.0.3').option('-c, --configuration [file]', "Location of configuration file.").option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.").option('-u, --user [username]', 'Google username').option('-p, --harvestpass [pass]', 'Password for Harvest').option('-g, --googlepass [pass]', 'Password for Google').option('-c, --calendar [calendar]', "Name of Google Calendar").option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', function(val) {
+Program.version('0.0.5').option('-c, --configuration [file]', "Location of configuration file.").option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.").option('-u, --user [username]', 'Google username').option('-p, --harvestpass [pass]', 'Password for Harvest').option('-d, --harvestdomain [domain]', "The Harvest domain, e.g. you access Harvest at http://" + "mydomain".bold + ".harvestapp.com/.").option('-g, --googlepass [pass]', 'Password for Google').option('-c, --calendar [calendar]', "Name of Google Calendar").option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', function(val) {
   var r;
   r = val.split("..");
   return {
@@ -114,11 +114,12 @@ Harvest
 
 Harvest = (function() {
 
-  function Harvest(user, password, login, fail) {
+  function Harvest(user, password, domain, login, fail) {
     var basicauth, options, request;
     var _this = this;
     this.user = user;
     this.password = password;
+    this.domain = domain;
     basicauth = new Buffer("" + this.user + ":" + this.password).toString('base64').trim();
     this.headers = {
       "Accept": "application/json",
@@ -126,7 +127,7 @@ Harvest = (function() {
       "Authorization": "Basic " + basicauth,
       "User-Agent": "Cetrea Harvester/" + (Program.version())
     };
-    this.host = "cetrea.harvestapp.com";
+    this.host = "" + domain + ".harvestapp.com";
     options = {
       host: this.host,
       path: "/account/who_am_i",
@@ -411,10 +412,11 @@ Harvest = (function() {
 
 Harvester = (function() {
 
-  function Harvester(user, googlepass, harvestpass, calendar, range) {
+  function Harvester(user, googlepass, harvestpass, harvestdomain, calendar, range) {
     this.user = user;
     this.googlepass = googlepass;
     this.harvestpass = harvestpass;
+    this.harvestdomain = harvestdomain;
     this.calendar = calendar;
     this.range = range;
     this.nounInflector = new natural.NounInflector();
@@ -441,7 +443,7 @@ Harvester = (function() {
     var _this = this;
     this.program = program;
     console.log("⬆ Harvest: Authenticating ...".blue);
-    return this.harvest = new Harvest(this.user, this.harvestpass, (function() {
+    return this.harvest = new Harvest(this.user, this.harvestpass, this.harvestdomain, (function() {
       return _this._0_harvestauthenticated();
     }), (function() {
       return _this.fail("Unable to authenticate with Harvest.");
@@ -779,8 +781,8 @@ Prompt.get((function() {
     process.exit(1);
   }
   return Prompt.get((function() {
-    var _i, _len, _ref10, _ref11, _ref12, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9, _results;
-    _ref12 = [
+    var _i, _len, _ref10, _ref11, _ref12, _ref13, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9, _results;
+    _ref13 = [
       !(Program.user != null) && !(((_ref3 = Program.configuration) != null ? _ref3.user : void 0) != null) ? {
         name: "user",
         message: "What is your username (exclude @c3a.dk)? "
@@ -792,26 +794,29 @@ Prompt.get((function() {
         name: "harvestpass",
         message: "What is your Harvest password? ",
         hidden: true
-      } : void 0, !(Program.action != null) && !(Program.calendar != null) && !(((_ref7 = Program.configuration) != null ? _ref7.calendar : void 0) != null) ? {
+      } : void 0, !(Program.harvestdomain != null) && !(((_ref7 = Program.configuration) != null ? _ref7.domain : void 0) != null) ? {
+        name: "harvestdomain",
+        message: "What is your Harvest domain? "
+      } : void 0, !(Program.action != null) && !(Program.calendar != null) && !(((_ref8 = Program.configuration) != null ? _ref8.calendar : void 0) != null) ? {
         name: "calendar",
         message: "Enter calendar from which to extract events. "
-      } : void 0, Program.action !== "tasks" && !(Program.range != null) && !(((_ref8 = Program.configuration) != null ? (_ref9 = _ref8.range) != null ? _ref9.from : void 0 : void 0) != null) ? {
+      } : void 0, Program.action !== "tasks" && !(Program.range != null) && !(((_ref9 = Program.configuration) != null ? (_ref10 = _ref9.range) != null ? _ref10.from : void 0 : void 0) != null) ? {
         name: "from",
         message: "Enter the start date for the search in the form YYYYMMDD. "
-      } : void 0, Program.action !== "tasks" && !(Program.range != null) && !(((_ref10 = Program.configuration) != null ? (_ref11 = _ref10.range) != null ? _ref11.to : void 0 : void 0) != null) ? {
+      } : void 0, Program.action !== "tasks" && !(Program.range != null) && !(((_ref11 = Program.configuration) != null ? (_ref12 = _ref11.range) != null ? _ref12.to : void 0 : void 0) != null) ? {
         name: "to",
         message: "Enter the end date for the search in the form YYYYMMDD. "
       } : void 0
     ];
     _results = [];
-    for (_i = 0, _len = _ref12.length; _i < _len; _i++) {
-      p = _ref12[_i];
+    for (_i = 0, _len = _ref13.length; _i < _len; _i++) {
+      p = _ref13[_i];
       if (p != null) _results.push(p);
     }
     return _results;
   })(), function(err, result) {
-    var harvester, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
-    harvester = new Harvester((_ref3 = (_ref4 = Program.user) != null ? _ref4 : (_ref5 = Program.configuration) != null ? _ref5.user : void 0) != null ? _ref3 : result.user, (_ref6 = (_ref7 = Program.googlepass) != null ? _ref7 : (_ref8 = Program.configuration) != null ? _ref8.googlepass : void 0) != null ? _ref6 : result.googlepass, (_ref9 = (_ref10 = Program.harvestpass) != null ? _ref10 : (_ref11 = Program.configuration) != null ? _ref11.harvestpass : void 0) != null ? _ref9 : result.harvestpass, (_ref12 = (_ref13 = Program.calendar) != null ? _ref13 : (_ref14 = Program.configuration) != null ? _ref14.calendar : void 0) != null ? _ref12 : result.calendar, (_ref15 = (_ref16 = Program.range) != null ? _ref16 : (_ref17 = Program.configuration) != null ? _ref17.range : void 0) != null ? _ref15 : {
+    var harvester, _ref10, _ref11, _ref12, _ref13, _ref14, _ref15, _ref16, _ref17, _ref18, _ref19, _ref20, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    harvester = new Harvester((_ref3 = (_ref4 = Program.user) != null ? _ref4 : (_ref5 = Program.configuration) != null ? _ref5.user : void 0) != null ? _ref3 : result.user, (_ref6 = (_ref7 = Program.googlepass) != null ? _ref7 : (_ref8 = Program.configuration) != null ? _ref8.googlepass : void 0) != null ? _ref6 : result.googlepass, (_ref9 = (_ref10 = Program.harvestpass) != null ? _ref10 : (_ref11 = Program.configuration) != null ? _ref11.harvestpass : void 0) != null ? _ref9 : result.harvestpass, (_ref12 = (_ref13 = Program.harvestdomain) != null ? _ref13 : (_ref14 = Program.configuration) != null ? _ref14.harvestdomain : void 0) != null ? _ref12 : result.harvestdomain, (_ref15 = (_ref16 = Program.calendar) != null ? _ref16 : (_ref17 = Program.configuration) != null ? _ref17.calendar : void 0) != null ? _ref15 : result.calendar, (_ref18 = (_ref19 = Program.range) != null ? _ref19 : (_ref20 = Program.configuration) != null ? _ref20.range : void 0) != null ? _ref18 : {
       from: result.from,
       to: result.to
     });
