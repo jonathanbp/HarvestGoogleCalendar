@@ -14,7 +14,7 @@ require("colors")
 cliff = require("cliff")
 
 Program
-  .version('0.0.2')
+  .version('0.0.3')
   .option('-c, --configuration [file]', "Location of configuration file.")
   .option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.")
   .option('-u, --user [username]', 'Google username')
@@ -667,39 +667,3 @@ Prompt.get(
         harvester.run(Program)    
     )
 )
-
-
-
-# do things with google services
-###
-(require('https').request({
-  host: 'www.google.com',
-  port: 443,
-  path: path,
-  method: 'GET',
-  headers: {
-    'Authorization': 'GoogleLogin auth=' + googleAuth.getAuthId(),
-    ...
-  }
-});
-###
-
-###
-switch(e.message) {
-  case GoogleClientLogin.errors.loginFailed:
-    if (this.isCaptchaRequired()) {
-      requestCaptchaFromUser(this.getCaptchaUrl(), this.getCaptchaToken());
-    } else {
-      requestLoginDetailsAgain();
-    }
-    break;
-  case GoogleClientLogin.errors.tokenMissing:
-  case GoogleClientLogin.errors.captchaMissing:
-    throw new Error('You must pass the both captcha token and the captcha')
-    break;
-}
-throw new Error('Unknown error');
-# damn..
-###
-
-#googleAuth.login()

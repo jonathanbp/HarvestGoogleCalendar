@@ -1,6 +1,6 @@
 # HarvestGoogleCalendar
 
-`v. 0.0.2`
+`v. 0.0.3`
 
 This is a tool for harvesting information from [Google Calendar](http://google.com/calendar) into the [Harvest](http://www.getharvest.com/) time tracking system. The tool basically;
 
