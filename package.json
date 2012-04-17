@@ -1,6 +1,13 @@
 {
     "name": "harvestgoogle",
     "version": "0.0.2",
+    "author": "Jonathan Bunde-Pedersen <jonathanbp@gmail.com>",
+    "keywords": ["harvest", "google calendar", "calendar"],
+    "repository": { 
+        "type" : "git",
+        "url" : "https://github.com/jonathanbp/HarvestGoogleCalendar"
+    },
+    "bin": { "harvestgoogle" : "./bin/harvestgoogle.js" },
     "dependencies": {
         "googleclientlogin": "0.2.3",
         "colors": "0.6.0",
