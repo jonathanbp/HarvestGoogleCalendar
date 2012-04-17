@@ -14,7 +14,7 @@ require("colors")
 cliff = require("cliff")
 
 Program
-  .version('0.0.1')
+  .version('0.0.2')
   .option('-c, --configuration [file]', "Location of configuration file.")
   .option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.")
   .option('-u, --user [username]', 'Google username')
@@ -81,7 +81,7 @@ class GoogleCalendar
               for event in events
                 do (event) ->
                   if event.start?.dateTime? and event.end?.dateTime?
-                    event.duration_in_hours = parseFloat(moment(event.end.dateTime).diff(moment(event.start.dateTime),"hours",true))
+                    event.duration_in_hours = parseFloat(moment(event.end.dateTime).diff(moment(event.start.dateTime),"hours",true)).toFixed(2)
               # we do not want the original recurrence
               events = _.filter(events, (event) -> not event.recurrence?)
               data(events)
@@ -256,7 +256,7 @@ class Harvest
             entries = _.pluck(JSON.parse(chunks),"day_entry")
             for entry in entries
               do (entry) ->
-                entry.duration_in_hours = parseFloat(entry.hours) or 0
+                entry.duration_in_hours = parseFloat(entry.hours).toFixed(2) or 0
             data(entries)
         )
     )
@@ -496,12 +496,16 @@ class Harvester
         _.any(
           Program.configuration.mappings,
           (mapping) ->
-            [property, regex] = mapping.rule.split(":")
-            if new RegExp(regex).test(event[property])
-              event.matched_by = mapping
-              true
-            else
-              false
+            _.all(
+              mapping.rules,
+              (rule) ->
+                for property, regex of rule
+                  if new RegExp(regex).test(event[property])
+                    event.matched_by = mapping
+                    return true
+                  else
+                    return false
+            )
         )
     )
 
@@ -515,7 +519,7 @@ class Harvester
           event.summary,
           moment(event.start.dateTime).format("MMMM Do YYYY, H:mm:ss"),
           event.duration_in_hours,
-          "#{event.matched_by.name} (#{event.matched_by.rule})",
+          "#{event.matched_by.name}",
           "ADD".green + " #{event.matched_by.project_id} #{event.matched_by.task_id}"
         ])
 

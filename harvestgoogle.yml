@@ -19,20 +19,26 @@ mappings:
   - name: architecture
     task_id: 1306535
     project_id: 2039308
-    rule: "summary:^Architecture"
+    rules: 
+      - summary: "^Architecture"
   - name: innovation
     project_id: 2039308
     task_id: 1306538
-    rule: summary:(design|innovation)
+    rules: 
+      - summary: "(design|innovation)"
   - name: ledermøde
     project_id: 1630222
     task_id: 1034544
-    rule: summary:^Ledermøde$
+    rules: 
+      - summary: "^Ledermøde$"
   - name: strategi
     project_id: 1630222
     task_id: 1034544
-    rule: "summary:[Ss]trateg[iy]"
+    rules: 
+      - summary: "[Ss]trateg[iy]"
   - name: sprints
     project_id: 2039286
     task_id: 1306526
-    rule: "summary:[Ss]print"
+    rules: 
+      - summary: "[Ss]print"
+      - summary: "Planning"
