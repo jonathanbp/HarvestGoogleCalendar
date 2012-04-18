@@ -49,11 +49,11 @@ Each mapping interpreted as so:
 And example could be:
 
 	- name: Breakfasts at Tiffany's
-    project_id: 123456
-    task_id: 654321
-    rules: 
-      - summary: "[Bb]reakfast"
-      - location: "Tiffany"
+    	  project_id: 123456
+    	  task_id: 654321
+    	  rules: 
+          - summary: "[Bb]reakfast"
+          - location: "Tiffany"
 
 Which, when run, will create Harvest entries in with the given task + project corresponding to all events which contain "Breakfast" or "breakfast" in the title (summary) and a location which contains "Tiffany".
 
