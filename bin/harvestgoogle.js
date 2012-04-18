@@ -23,7 +23,7 @@ require("colors");
 
 cliff = require("cliff");
 
-Program.version('0.0.5').option('-c, --configuration [file]', "Location of configuration file.").option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.").option('-u, --user [username]', 'Google username').option('-p, --harvestpass [pass]', 'Password for Harvest').option('-d, --harvestdomain [domain]', "The Harvest domain, e.g. you access Harvest at http://" + "mydomain".bold + ".harvestapp.com/.").option('-g, --googlepass [pass]', 'Password for Google').option('-c, --calendar [calendar]', "Name of Google Calendar").option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', function(val) {
+Program.version('0.0.6').option('-c, --configuration [file]', "Location of configuration file.").option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.").option('-u, --user [username]', 'Google username').option('-p, --harvestpass [pass]', 'Password for Harvest').option('-d, --harvestdomain [domain]', "The Harvest domain, e.g. you access Harvest at http://" + "mydomain".bold + ".harvestapp.com/.").option('-g, --googlepass [pass]', 'Password for Google').option('-c, --calendar [calendar]', "Name of Google Calendar").option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', function(val) {
   var r;
   r = val.split("..");
   return {
@@ -690,11 +690,12 @@ Harvester = (function() {
           _fn2 = function(entry) {
             var _this = this;
             return harvest.update(entry.id, {
+              notes: entry.notes,
               hours: entry.new_duration_in_hours
             }, (function(result) {
               return console.log(("✔ Updated " + entry.id + " successfully").green);
             }), (function() {
-              return _this.fail("Could not update entry " + entry.id + " in Harvest");
+              return _this.fail("Could not update entry " + (entry != null ? entry.id : void 0) + " in Harvest");
             }));
           };
           for (_j = 0, _len2 = updates.length; _j < _len2; _j++) {
@@ -706,7 +707,7 @@ Harvester = (function() {
             return harvest["delete"](entry.id, (function() {
               return console.log(("✔ Deleted " + entry.id + " successfully").green);
             }), (function() {
-              return _this.fail("Could not delete entry (" + entry.id + ") in Harvest");
+              return _this.fail("Could not delete entry (" + (entry != null ? entry.id : void 0) + ") in Harvest");
             }));
           };
           for (_k = 0, _len3 = deletes.length; _k < _len3; _k++) {
@@ -726,7 +727,7 @@ Harvester = (function() {
               }, (function(result) {
                 return console.log(("✔ Created Harvest entry from \"" + event.summary + "\" on " + (moment(event.start.dateTime).format("ddd, D MMM YYYY")) + " successfully").green);
               }), (function() {
-                return _this.fail("Could not create entry " + entry.id + " - \"" + event.summary + "\" in Harvest");
+                return _this.fail("Could not create entry " + (entry != null ? entry.id : void 0) + " - \"" + (event != null ? event.summary : void 0) + "\" in Harvest");
               }));
             })(event));
           }
