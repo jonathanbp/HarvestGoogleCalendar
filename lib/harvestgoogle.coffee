@@ -12,7 +12,7 @@ require("colors")
 cliff = require("cliff")
 
 Program
-  .version('0.0.5')
+  .version('0.0.6')
   .option('-c, --configuration [file]', "Location of configuration file.")
   .option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.")
   .option('-u, --user [username]', 'Google username')
@@ -575,17 +575,18 @@ class Harvester
                 harvest.update(
                   entry.id,
                   {
+                    notes: entry.notes
                     hours: entry.new_duration_in_hours
                   },
                   ((result) => console.log "✔ Updated #{entry.id} successfully".green),
-                  (()=>@fail("Could not update entry #{entry.id} in Harvest"))
+                  (()=>@fail("Could not update entry #{entry?.id} in Harvest"))
                 )
             for entry in deletes
               do (entry) ->
                 harvest.delete(
                   entry.id,
                   (() -> console.log "✔ Deleted #{entry.id} successfully".green),
-                  (()=>@fail("Could not delete entry (#{entry.id}) in Harvest"))
+                  (()=>@fail("Could not delete entry (#{entry?.id}) in Harvest"))
                 )
             for event in creates
               do (event) =>
@@ -599,7 +600,7 @@ class Harvester
                     notes: "#{escape(event.summary)} - harvested:#{event.id}"
                   },
                   ((result) -> console.log "✔ Created Harvest entry from \"#{event.summary}\" on #{moment(event.start.dateTime).format("ddd, D MMM YYYY")} successfully".green),
-                  (()=>@fail("Could not create entry #{entry.id} - \"#{event.summary}\" in Harvest"))
+                  (()=>@fail("Could not create entry #{entry?.id} - \"#{event?.summary}\" in Harvest"))
                 )
           else
             console.log "Ok, nevermind then.".red
