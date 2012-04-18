@@ -12,7 +12,7 @@ require("colors")
 cliff = require("cliff")
 
 Program
-  .version('0.0.6')
+  .version('0.0.7')
   .option('-c, --configuration [file]', "Location of configuration file.")
   .option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.")
   .option('-u, --user [username]', 'Google username')
