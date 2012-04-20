@@ -12,7 +12,7 @@ require("colors")
 cliff = require("cliff")
 
 Program
-  .version('0.0.7')
+  .version('0.0.8')
   .option('-c, --configuration [file]', "Location of configuration file.")
   .option('-a, --action [action]', "Execute action. Available actions are: " + "'tasks'".bold + " to show a list of available tasks in Harvest, " + "'clear'".bold + " to clear all linked tasks in Harvest. Leave blank to synchronize.")
   .option('-u, --user [username]', 'Google username')
@@ -475,8 +475,10 @@ class Harvester
     updatable_harvest_entries = _.filter(updatable_harvest_entries, 
       (entry) -> 
         calendared_duration_in_hours = event_lookup[entry?.event_id].duration_in_hours
-        if entry?.duration_in_hours isnt calendared_duration_in_hours
+        calendared_date = moment(event_lookup[entry?.event_id].start?.dateTime)
+        if entry?.duration_in_hours isnt calendared_duration_in_hours or moment(entry?.spent_at).format("YYYYMMDD") isnt calendared_date.format("YYYYMMDD")
           entry?.new_duration_in_hours = calendared_duration_in_hours
+          entry?.new_spent_at = calendared_date
           true
         else
           false
@@ -548,7 +550,7 @@ class Harvester
             moment(entry.spent_at).format("MMMM Do YYYY, H:mm:ss"),
             entry.duration_in_hours,
             "N/A".italic,
-            "UPDATE".blue + " #{entry.id}, hours => #{entry.new_duration_in_hours}"
+            "UPDATE".blue + " #{entry.id}, hours => #{entry.new_duration_in_hours}, spent_at => #{entry.new_spent_at.format("ddd, D MMM YYYY")}"
           ]
       ),
       (line) -> summary.push(line)
@@ -577,6 +579,7 @@ class Harvester
                   {
                     notes: entry.notes
                     hours: entry.new_duration_in_hours
+                    spent_at: entry.new_spent_at.format("ddd, D MMM YYYY")
                   },
                   ((result) => console.log "✔ Updated #{entry.id} successfully".green),
                   (()=>@fail("Could not update entry #{entry?.id} in Harvest"))
@@ -597,7 +600,7 @@ class Harvester
                     task_id: event.matched_by.task_id
                     spent_at: moment(event.start.dateTime).format("ddd, D MMM YYYY")
                     # html encode?
-                    notes: "#{escape(event.summary)} - harvested:#{event.id}"
+                    notes: "#{escape(event.summary)}, from:#{event.start?.dateTime}, to:#{event.end?.dateTime}, harvested:#{event.id}"
                   },
                   ((result) -> console.log "✔ Created Harvest entry from \"#{event.summary}\" on #{moment(event.start.dateTime).format("ddd, D MMM YYYY")} successfully".green),
                   (()=>@fail("Could not create entry #{entry?.id} - \"#{event?.summary}\" in Harvest"))
