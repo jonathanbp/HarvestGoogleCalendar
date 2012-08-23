@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/jonathanbp/HarvestGoogleCalendar.png)](http://travis-ci.org/jonathanbp/HarvestGoogleCalendar)
 # HarvestGoogleCalendar
 
 `v. 0.0.8`
