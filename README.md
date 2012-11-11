@@ -1,6 +1,6 @@
 # HarvestGoogleCalendar
 
-`v. 0.0.8`
+`v. 0.0.9`
 
 This is a tool for harvesting information from [Google Calendar](http://google.com/calendar) into the [Harvest](http://www.getharvest.com/) time tracking system. The tool basically;
 
@@ -58,6 +58,10 @@ And example could be:
 Which, when run, will create Harvest entries in with the given task + project corresponding to all events which contain "Breakfast" or "breakfast" in the title (summary) and a location which contains "Tiffany".
 
 ## Changelog
+
+### 0.0.9
+
+ * Updated prompt dependency.
 
 ### 0.0.8
 

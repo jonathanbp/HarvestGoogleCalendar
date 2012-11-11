@@ -1,6 +1,6 @@
 {
     "name": "harvestgoogle",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "A tool for harvesting Google Calendar events into the Harvest time tracker",
     "author": "Jonathan Bunde-Pedersen <jonathanbp@gmail.com>",
     "keywords": ["harvest", "google calendar", "calendar"],
@@ -17,7 +17,7 @@
         "googleclientlogin": "0.2.3",
         "colors": "0.6.0",
         "commander": "0.5.2",
-        "prompt": "0.1.12",
+        "prompt": "0.2.8",
 		"moment": "1.5.1",
 		"underscore": "1.3.3",
         "natural": "0.1.7",
