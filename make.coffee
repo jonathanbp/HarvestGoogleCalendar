@@ -1,1 +1,0 @@
-coffee -b -o bin -c lib/harvestgoogle.coffee
