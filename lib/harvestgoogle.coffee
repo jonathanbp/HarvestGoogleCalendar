@@ -253,9 +253,9 @@ class Harvest
           () ->
             # enrich content (duration in hours as a float)
             entries = _.pluck(JSON.parse(chunks),"day_entry")
-            for entry in entries
+            for entry in entries when entry?
               do (entry) ->
-                entry.duration_in_hours = parseFloat(entry.hours).toFixed(2) or 0
+                entry.duration_in_hours = parseFloat(entry?.hours).toFixed(2) or 0
             data(entries)
         )
     )
