@@ -659,7 +659,7 @@ Harvester = (function() {
           var property, regex;
           for (property in rule) {
             regex = rule[property];
-            if (new RegExp(regex).test(event[property])) {
+            if (new RegExp(regex, "i").test(event[property])) {
               event.matched_by = mapping;
               return true;
             } else {
