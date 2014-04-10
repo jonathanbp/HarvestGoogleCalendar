@@ -501,7 +501,7 @@ class Harvester
               mapping.rules,
               (rule) ->
                 for property, regex of rule
-                  if new RegExp(regex).test(event[property])
+                  if new RegExp(regex, "i").test(event[property])
                     event.matched_by = mapping
                     return true
                   else
