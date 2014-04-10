@@ -58,7 +58,7 @@ class GoogleCalendar
     if @authenticated
       query.from = "#{query.from[0..3]}-#{query.from[4..5]}-#{query.from[6..7]}"
       query.to = "#{query.to[0..3]}-#{query.to[4..5]}-#{query.to[6..7]}"
-      path = "/calendar/v3/calendars/#{encodeURIComponent(query.calendar)}/events?key=AIzaSyB-wuGViS_V9ZZpF_GQVQxrxtnw2E3iL3c&timeMin=#{encodeURIComponent(query.from+"T00:00:00.000Z")}&timeMax=#{encodeURIComponent(query.to+"T00:00:00.000Z")}&maxResults=#{@maxResults}"
+      path = "/calendar/v3/calendars/#{encodeURIComponent(query.calendar)}/events?key=AIzaSyB-wuGViS_V9ZZpF_GQVQxrxtnw2E3iL3c&timeMin=#{encodeURIComponent(query.from+"T00:00:00.000Z")}&timeMax=#{encodeURIComponent(query.to+"T23:59:59.999Z")}&maxResults=#{@maxResults}"
       options = 
         host: 'www.googleapis.com'
         path: path
