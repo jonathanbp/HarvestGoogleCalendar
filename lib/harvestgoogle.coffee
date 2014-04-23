@@ -20,8 +20,8 @@ Program
   .option('-d, --harvestdomain [domain]', "The Harvest domain, e.g. you access Harvest at http://" + "mydomain".bold + ".harvestapp.com/.")
   .option('-g, --googlepass [pass]', 'Password for Google')
   .option('-c, --calendar [calendar]', "Name of Google Calendar")
-  .option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange', 
-    (val) -> 
+  .option('-r, --range [YYYYMMDD]..[YYYYMMDD]', 'A timerange',
+    (val) ->
       r = val.split("..")
       { from: r[0], to: r[1] }
   )
@@ -31,7 +31,7 @@ Program
 ###
 Google Calendar
 ###
-class GoogleCalendar 
+class GoogleCalendar
   constructor: (@user, @password, login, fail) ->
     @maxResults = 1000
     @auth = new GoogleClientLogin(
@@ -42,14 +42,14 @@ class GoogleCalendar
     )
     @authenticated = false
     @auth.on(
-      GoogleClientLogin.events.login, 
-      () => 
+      GoogleClientLogin.events.login,
+      () =>
         @authenticated = true
         login()
     )
     @auth.on(
-      GoogleClientLogin.events.error, 
-      (e) -> 
+      GoogleClientLogin.events.error,
+      (e) ->
         fail()
     )
     @auth.login()
@@ -58,8 +58,8 @@ class GoogleCalendar
     if @authenticated
       query.from = "#{query.from[0..3]}-#{query.from[4..5]}-#{query.from[6..7]}"
       query.to = "#{query.to[0..3]}-#{query.to[4..5]}-#{query.to[6..7]}"
-      path = "/calendar/v3/calendars/#{encodeURIComponent(query.calendar)}/events?key=AIzaSyB-wuGViS_V9ZZpF_GQVQxrxtnw2E3iL3c&singleEvents=true&timeMin=#{encodeURIComponent(query.from+"T00:00:00.000Z")}&timeMax=#{encodeURIComponent(query.to+"T00:00:00.000Z")}&maxResults=#{@maxResults}"
-      options = 
+      path = "/calendar/v3/calendars/#{encodeURIComponent(query.calendar)}/events?key=AIzaSyB-wuGViS_V9ZZpF_GQVQxrxtnw2E3iL3c&singleEvents=true&timeMin=#{encodeURIComponent(query.from+"T00:00:00.000Z")}&timeMax=#{encodeURIComponent(query.to+"T23:59:59.999Z")}&maxResults=#{@maxResults}"
+      options =
         host: 'www.googleapis.com'
         path: path
         method: 'GET'
@@ -73,9 +73,9 @@ class GoogleCalendar
           #console.log("headers: ", res.headers)
           chunks = ""
           res.on('data', (chunk) -> chunks += chunk)
-          
-          res.on('end', 
-            () -> 
+
+          res.on('end',
+            () ->
               events = JSON.parse(chunks).items
               for event in events
                 do (event) ->
@@ -92,7 +92,7 @@ Harvest
 ###
 class Harvest
 
-  constructor: (@user, @password, @domain, login, fail) -> 
+  constructor: (@user, @password, @domain, login, fail) ->
     # login
     basicauth = new Buffer("#{@user}:#{@password}").toString('base64').trim()
 
@@ -112,17 +112,17 @@ class Harvest
     request = HTTPS.request(
       options
       (res) =>
-        fail() if res.statusCode isnt 200  
+        fail() if res.statusCode isnt 200
         chunks = ""
         res.on('data', (chunk) -> chunks += chunk)
-        res.on('end', 
-          () => 
+        res.on('end',
+          () =>
             @me = JSON.parse(chunks)
-            if res.statusCode == 200 
+            if res.statusCode == 200
               login()
             else
               fail()
-        ) 
+        )
     )
     request.end()
     request.on("error", fail)
@@ -137,10 +137,10 @@ class Harvest
       options
       (res) =>
         chunks = ""
-        res.on('data', 
+        res.on('data',
           (chunk) -> chunks += chunk
         )
-        res.on('end', 
+        res.on('end',
           () =>
             @projects = _.pluck(JSON.parse(chunks),"project")
             @project_lookup = _.reduce(@projects, ((memo, project) -> memo[project.id] = project; memo), {})
@@ -160,10 +160,10 @@ class Harvest
       options
       (res) =>
         chunks = ""
-        res.on('data', 
+        res.on('data',
           (chunk) -> chunks += chunk
         )
-        res.on('end', 
+        res.on('end',
           () =>
             @tasks = _.pluck(JSON.parse(chunks),"task")
             @task_lookup = _.reduce(@tasks, ((memo, task) -> memo[task.id] = task; memo), {})
@@ -175,7 +175,7 @@ class Harvest
 
   arewedone: (done) ->
     @requests -= 1
-    if @requests <= 0 
+    if @requests <= 0
       done()
 
 
@@ -183,7 +183,7 @@ class Harvest
     # first retrieve all projects
     @projects(
       ((projects) =>
-       
+
         ps(projects)
         # then retrieve all tasks
         @tasks(
@@ -203,12 +203,12 @@ class Harvest
                   options
                   (res) =>
                     chunks = ""
-                    res.on('data', 
-                      (chunk) -> 
+                    res.on('data',
+                      (chunk) ->
                         chunks += chunk
                     )
-                    res.on('end', 
-                      () => 
+                    res.on('end',
+                      () =>
                         try
                           taskassignments = _.pluck(JSON.parse(chunks), "task_assignment")
                           for ta in taskassignments
@@ -247,7 +247,7 @@ class Harvest
       (res) ->
         chunks = ""
         res.on('data', (chunk) -> chunks += chunk)
-        res.on('end', 
+        res.on('end',
           () ->
             # enrich content (duration in hours as a float)
             entries = _.pluck(JSON.parse(chunks),"day_entry")
@@ -261,8 +261,8 @@ class Harvest
     request.end()
     request.on("error", fail)
 
-  ### 
-    entry 
+  ###
+    entry
       hours (int) REQUIRED
       project_id (str) REQUIRED
       task_id (str) REQUIRED
@@ -293,7 +293,7 @@ class Harvest
         else
           chunks = ""
           res.on('data', (chunk) -> chunks += chunk)
-          res.on('end', () -> 
+          res.on('end', () ->
               success(JSON.parse(chunks))
           )
     )
@@ -302,7 +302,7 @@ class Harvest
     request.end()
     request.on("error", fail)
 
-  ### 
+  ###
     entry
       hours (int) REQUIRED
       project_id (str) REQUIRED
@@ -330,7 +330,7 @@ class Harvest
         fail() if res.statusCode isnt 200
         chunks = ""
         res.on('data', (chunk) -> chunks += chunk)
-        res.on('end', () -> 
+        res.on('end', () ->
           if res.statusCode is 200
             success(JSON.parse(chunks))
         )
@@ -358,7 +358,7 @@ class Harvest
         fail() if res.statusCode isnt 200
         chunks = ""
         res.on('data', (chunk) -> chunks += chunk)
-        res.on('end', () -> 
+        res.on('end', () ->
           if res.statusCode is 200
             success()
           else
@@ -371,7 +371,7 @@ class Harvest
 
   isCalendared: (entry) -> entry?.notes?.indexOf("harvested:") >= 0
 
-class Harvester 
+class Harvester
 
   constructor: (@user, @googlepass, @harvestpass, @harvestdomain, @calendar, @range) ->
     @nounInflector = new natural.NounInflector()
@@ -397,13 +397,13 @@ class Harvester
     @harvest = new Harvest(@user, @harvestpass, @harvestdomain, (() => @_0_harvestauthenticated()), (() => @fail("Unable to authenticate with Harvest.")))
 
   _0_harvestauthenticated: ->
-    console.log "✔ Harvest: Authenticated".green 
+    console.log "✔ Harvest: Authenticated".green
 
     if @program.action is "tasks"
       # lists tasks and exit
       @harvest.projectsandtasks(
         ((projects)-> console.log "#{projects.length} projects"),
-        ((project, taskassignments) -> 
+        ((project, taskassignments) ->
           for ta in taskassignments
             do (ta) =>
               console.log "#{project.id}\t#{ta.task.id}\t#{project.name}\t#{ta.task.name}"
@@ -413,8 +413,8 @@ class Harvester
       )
     else if @program.action is "clear"
       @harvest.entries(
-        @range.from, 
-        @range.to, 
+        @range.from,
+        @range.to,
         ((entries)=>
           for entry in entries when entry?.hours isnt "0.0" and @harvest.isCalendared(entry)
             do (entry) =>
@@ -423,7 +423,7 @@ class Harvester
                 (() -> console.log "✔ Deleted #{entry.id} successfully".green),
                 (()=>@fail("Could not delete entry (#{entry.id}) in Harvest"))
               )
-        ), 
+        ),
         (() => @fail("Harvest: Retrieving existing harvest entries failed."))
       )
     else
@@ -452,7 +452,7 @@ class Harvester
 
   _3_googleharvested: (events) ->
 
-    @fail("Google: MaxResults (#{@cal.maxResults}) exceeded, try with a smaller range") if events.length is @cal.maxResults 
+    @fail("Google: MaxResults (#{@cal.maxResults}) exceeded, try with a smaller range") if events.length is @cal.maxResults
 
     console.log "✔ Google: Harvested #{events.length} #{@noun("event", events.length)}. Now looking for matches.".green
 
@@ -470,8 +470,8 @@ class Harvester
     event_lookup = _.reduce(events, ((memo, event) -> memo[event.id] = event; memo), {})
 
     # these must be updated
-    updatable_harvest_entries = _.filter(updatable_harvest_entries, 
-      (entry) -> 
+    updatable_harvest_entries = _.filter(updatable_harvest_entries,
+      (entry) ->
         calendared_duration_in_hours = event_lookup[entry?.event_id].duration_in_hours
         calendared_date = moment(event_lookup[entry?.event_id].start?.dateTime)
         if entry?.duration_in_hours isnt calendared_duration_in_hours or moment(entry?.spent_at).format("YYYYMMDD") isnt calendared_date.format("YYYYMMDD")
@@ -482,7 +482,7 @@ class Harvester
           false
     )
 
-    
+
     # 2) go through all calendar events and find matches for rules
 
     # all new events
@@ -555,7 +555,7 @@ class Harvester
     )
 
     # PRINT SUMMARY
-    if summary.length is 1 
+    if summary.length is 1
       console.log "•" + " Nothing to do. Put more stuff in your calendar and/or create more mappings".grey
       @_N_exit()
 
@@ -609,13 +609,13 @@ class Harvester
       ))(@harvest, updatable_harvest_entries, deletable_harvest_entries, matching_events)
 
 
-    
 
-    
+
+
 
   _N_exit: -> process.exit(0)
 
-  fail: (msg) -> 
+  fail: (msg) ->
     console.log("✘ #{msg}".red)
     process.exit(1)
 
@@ -631,11 +631,11 @@ Prompt.start()
 
 Prompt.get(
   (p for p in [
-    if not Program.configuration? 
+    if not Program.configuration?
       { name: "configuration", message: "Please input location of your configuration file. "}
   ] when p?)
   (err, result) ->
-    try 
+    try
       Program.configuration = require(Program.configuration ? result.configuration).shift()
     catch error
       console.log "✘ Could not find or parse configuration file (#{Program.configuration ? result.configuration})".red
@@ -658,16 +658,16 @@ Prompt.get(
         if Program.action isnt "tasks" and not Program.range? and not Program.configuration?.range?.to?
           { name: "to", message: "Enter the end date for the search in the form YYYYMMDD. " }
       ] when p?)
-      (err, result) -> 
-  
+      (err, result) ->
+
         harvester = new Harvester(
-          Program.user ? Program.configuration?.user ? result.user, 
-          Program.googlepass ? Program.configuration?.googlepass ? result.googlepass, 
-          Program.harvestpass ? Program.configuration?.harvestpass ? result.harvestpass, 
-          Program.harvestdomain ? Program.configuration?.harvestdomain ? result.harvestdomain, 
+          Program.user ? Program.configuration?.user ? result.user,
+          Program.googlepass ? Program.configuration?.googlepass ? result.googlepass,
+          Program.harvestpass ? Program.configuration?.harvestpass ? result.harvestpass,
+          Program.harvestdomain ? Program.configuration?.harvestdomain ? result.harvestdomain,
           Program.calendar ? Program.configuration?.calendar ? result.calendar,
           Program.range ? Program.configuration?.range ? { from: result.from, to: result.to }
         )
-        harvester.run(Program)    
+        harvester.run(Program)
     )
 )
