@@ -66,7 +66,7 @@ GoogleCalendar = (function() {
     if (this.authenticated) {
       query.from = "" + query.from.slice(0, 4) + "-" + query.from.slice(4, 6) + "-" + query.from.slice(6, 8);
       query.to = "" + query.to.slice(0, 4) + "-" + query.to.slice(4, 6) + "-" + query.to.slice(6, 8);
-      path = "/calendar/v3/calendars/" + (encodeURIComponent(query.calendar)) + "/events?key=AIzaSyB-wuGViS_V9ZZpF_GQVQxrxtnw2E3iL3c&timeMin=" + (encodeURIComponent(query.from + "T00:00:00.000Z")) + "&timeMax=" + (encodeURIComponent(query.to + "T00:00:00.000Z")) + "&maxResults=" + this.maxResults;
+      path = "/calendar/v3/calendars/" + (encodeURIComponent(query.calendar)) + "/events?key=AIzaSyB-wuGViS_V9ZZpF_GQVQxrxtnw2E3iL3c&singleEvents=true&timeMin=" + (encodeURIComponent(query.from + "T00:00:00.000Z")) + "&timeMax=" + (encodeURIComponent(query.to + "T00:00:00.000Z")) + "&maxResults=" + this.maxResults;
       options = {
         host: 'www.googleapis.com',
         path: path,
@@ -94,9 +94,6 @@ GoogleCalendar = (function() {
             event = events[_i];
             _fn(event);
           }
-          events = _.filter(events, function(event) {
-            return event.recurrence == null;
-          });
           return data(events);
         });
       });
