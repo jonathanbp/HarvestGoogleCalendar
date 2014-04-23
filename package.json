@@ -1,16 +1,16 @@
 {
     "name": "harvestgoogle",
-    "version": "0.0.16",
+    "version": "0.0.18",
     "description": "A tool for harvesting Google Calendar events into the Harvest time tracker",
     "author": "Jonathan Bunde-Pedersen <jonathanbp@gmail.com>",
     "keywords": ["harvest", "google calendar", "calendar"],
-    "repository": { 
+    "repository": {
         "type" : "git",
         "url" : "https://github.com/jonathanbp/HarvestGoogleCalendar"
     },
     "homepage" : "https://github.com/jonathanbp/HarvestGoogleCalendar",
     "bin": { "harvestgoogle" : "./bin/harvestgoogle.js" },
-    "bugs": { 
+    "bugs": {
         "url" : "https://github.com/jonathanbp/HarvestGoogleCalendar/issues"
     },
     "dependencies": {

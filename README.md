@@ -20,7 +20,7 @@ Get [node.js](https://github.com/joyent/node/wiki/Installing-Node.js-via-package
 ## How To Run
 
 Options can either be given as command-line arguments, input into a YAML configuration file or be input when prompted.
-  
+
     Usage: harvestgoogle.coffee [options]
 
     Options:
@@ -51,7 +51,7 @@ And example could be:
     - name: Breakfasts at Tiffany's
       project_id: 123456
       task_id: 654321
-      rules: 
+      rules:
       - summary: "[Bb]reakfast"
       - location: "Tiffany"
 
@@ -59,9 +59,13 @@ Which, when run, will create Harvest entries in with the given task + project co
 
 ## Changelog
 
+### 0.0.18
+
+ * Recurring events are now treated as single events (via [pdclark](https://github.com/pdclark)). Thanks!
+
 ### 0.0.16
 
- * Regex is now case insensitive (via [pdclark](https://github.com/pdclark))
+ * Regex is now case insensitive (via [pdclark](https://github.com/pdclark)). Thanks!
 
 ### 0.0.10-15
 
